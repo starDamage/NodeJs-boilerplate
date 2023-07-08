@@ -13,7 +13,7 @@ app.use("/admin", AdminRoute);
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Hello, World!");
+  res.send("Hello, World and added some changes over here!");
 });
 
 export default app;
