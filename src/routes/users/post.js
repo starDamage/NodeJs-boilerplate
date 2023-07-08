@@ -4,6 +4,7 @@ import { ValidationError } from "joi";
 
 import db from "../../db/index";
 import { createUserValidation } from "./validations";
+import { CustomError } from "../../common/error";
 
 export const createUserHandler = async (req, res) => {
   const session = await db.startSession();
@@ -21,6 +22,9 @@ export const createUserHandler = async (req, res) => {
       country,
     } = req.body;
 
+    let isAvailable = await userModel.findOne({ email });
+    if (isAvailable) throw new CustomError(`User already exists`);
+
     let addUser = await userModel.create(
       [
         {
@@ -32,7 +36,6 @@ export const createUserHandler = async (req, res) => {
       ],
       { session: session }
     );
-
     let addressData = await addressModel.create(
       [
         {
@@ -50,7 +53,7 @@ export const createUserHandler = async (req, res) => {
     return res.status(200).send({ message: "User created successfully" });
   } catch (err) {
     await session.abortTransaction();
-    if (err instanceof ValidationError) {
+    if (err instanceof ValidationError || err instanceof CustomError) {
       return res.status(400).send({ message: err.message });
     }
     return res.status(500).send({ message: "Something went wrong..." });
