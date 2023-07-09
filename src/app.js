@@ -4,7 +4,6 @@ import AdminRoute from "./routes/admin";
 
 const app = express();
 
-// Middleware
 app.use(express.json());
 
 // custom routes
